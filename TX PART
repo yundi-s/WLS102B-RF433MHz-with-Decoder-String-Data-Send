@@ -1,0 +1,139 @@
+
+int state;
+String MY_dat;
+String MY2_dat;
+int dat[8];
+int en, clk,n;
+int bit;
+int x,y;
+int startconv=0;
+int stopconv=0;
+int countstart;
+char charbuf[50];
+char charbuf2[50];
+char charsend[50];
+String inputString = "YUNDI";        
+String dummy="xheloz";
+boolean stringComplete = false;  
+int i=-1;
+int stat=0;
+int num=0;
+unsigned long previousMillis =0;
+char a[20];
+void setup() {
+  // put your setup code here, to run once:
+pinMode(A2,OUTPUT);
+pinMode(A3,OUTPUT);
+pinMode(A4,OUTPUT);
+pinMode(A5,OUTPUT);
+
+Serial.begin(9600);
+ inputString.reserve(200);
+
+}
+
+void loop() {
+
+ unsigned long currentMillis = millis();
+    MY_dat="XX12351904807.038N01131.000EZZ";
+    MY2_dat="DD122BB";
+    MY_dat.toCharArray(charbuf,30);
+    MY2_dat.toCharArray(charbuf2,7);
+    for(int w=0;w<=29;w++)
+    {charsend[w]=charbuf[w];}
+    for(int w=30;w<=36;w++)
+    {charsend[w]=charbuf2[w-30];}
+    
+//a[num]=charbuf[num];
+a[0]='X';
+a[1]=charbuf[0];
+a[2]=charbuf[1];
+a[3]=charbuf[2];
+a[4]=charbuf[3];
+a[5]=charbuf[4];
+a[6]='Z';
+
+dat[0]=(charsend[num])%2;
+Serial.print(charsend[num]);
+for(int k=1; k<=7; k++)
+    {dat[k]=(charsend[num]>>k)%2;
+    }
+
+if((currentMillis-previousMillis)>=250)
+   {
+      previousMillis=currentMillis;
+      state++;
+    
+     if(state>=13){state=1;num++;
+     Serial.print("num =");
+     Serial.println(num);
+     if(num>36){num=0;}
+     }
+}
+
+if(state%2==0){
+    digitalWrite(A5,LOW);
+    digitalWrite(A4,LOW);
+    digitalWrite(A3,LOW);
+    digitalWrite(A2,LOW);
+    Serial.println(" send low ");
+  }
+if(state==1){
+    digitalWrite(A5,LOW);
+    digitalWrite(A4,LOW);
+    digitalWrite(A3,HIGH);
+    digitalWrite(A2,LOW);
+    Serial.println(" send initial..");
+  }
+if(state==3){
+      digitalWrite(A5,HIGH);
+      Serial.print("1");
+      digitalWrite(A4,HIGH); //clock high
+      Serial.print("1");
+      digitalWrite(A3,dat[1]);
+      Serial.print(dat[1]);
+      digitalWrite(A2,dat[0]);
+      Serial.println(dat[0]);
+  }
+if(state==5){
+      digitalWrite(A5,HIGH);
+      Serial.print("1");
+      digitalWrite(A4,HIGH); //clock high
+      Serial.print("1");
+      digitalWrite(A3,dat[3]);
+      Serial.print(dat[3]);
+      digitalWrite(A2,dat[2]);
+      Serial.println(dat[2]);
+  }
+
+  if(state==7){
+      digitalWrite(A5,HIGH);
+      Serial.print("1");
+      digitalWrite(A4,HIGH); //clock high
+      Serial.print("1");
+      digitalWrite(A3,dat[5]);
+      Serial.print(dat[5]);
+      digitalWrite(A2,dat[4]);
+      Serial.println(dat[4]);
+  }
+  if(state==9){
+      digitalWrite(A5,HIGH);
+      Serial.print("1");
+      digitalWrite(A4,HIGH); //clock high
+      Serial.print("1");
+      digitalWrite(A3,dat[7]);
+      Serial.print(dat[7]);
+      digitalWrite(A2,dat[6]);
+      Serial.println(dat[6]);
+  }
+if(state==11){
+    digitalWrite(A5,LOW);
+    digitalWrite(A4,LOW);
+    digitalWrite(A3,LOW);
+    digitalWrite(A2,HIGH);
+    Serial.println("STOP SEND DATA");   
+    
+  }
+
+
+}
