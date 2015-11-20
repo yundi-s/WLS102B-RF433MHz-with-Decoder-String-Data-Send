@@ -1,0 +1,180 @@
+int dat0, dat1, dat2, dat3;
+int enddata=0;
+int clkstat=0;
+int datreceive=0;
+int startconv=0;
+int dat[8];
+int datdig[8];
+int data_state=0;
+int en,clk,dig,sig;
+int i=0;
+int g=0; //number char
+char charbuf[100];
+int charnum[100];
+char value;
+String inputString = "";        
+boolean stringComplete = false;  
+
+
+void setup() {
+pinMode(A1,INPUT);
+pinMode(A2,INPUT);
+pinMode(A3,INPUT);
+pinMode(A4,INPUT);
+pinMode(A5,INPUT);
+Serial.begin(9600);
+inputString.reserve(200);
+}
+
+void loop() {
+sig=digitalRead(A1); en=digitalRead(A2);  clk=digitalRead(A3); dat1=digitalRead(A4) ;dat0=digitalRead(A5);
+
+if(en==0)
+{
+  if(clk==0)
+  {
+    if(dat1==1)
+    {
+     if(dat0==0)
+     {
+      
+     // if(startconv==0)
+      //{Serial.println("start log data");}   
+      
+      startconv=1;
+    
+      }
+     }
+    }
+ }
+
+
+if(startconv==1){  
+
+if(en==1) //enable akuisisi data
+  {
+   if(clk==1)
+   {
+
+    if(datreceive==0)
+    {
+    dat[2*i+1]=dat1;
+    dat[2*i]=dat0;
+  /*  Serial.print("i ke");
+    Serial.print(i);
+    Serial.print("  ");
+    //Serial.println(dat[i]);
+    Serial.print(dat[2*i + 1]);
+    Serial.println(dat[2*i]);*/
+    datreceive=1;
+    i++;
+    
+    } 
+   }
+  }
+
+if(en==0)
+{
+  if(clk==0)
+  {
+    if(dat1==0)
+    {
+     if(dat0==0)
+     {
+datreceive=0;
+      }
+     }
+    }
+}
+  
+
+
+if(en==0)
+{
+  if(clk==0)
+  {
+    if(dat1==0)
+    {
+     if(dat0==1)
+     {
+//
+if(i>=4){
+enddata=1;
+startconv=0;}
+      }
+     }
+    }
+  }
+
+
+}
+
+
+
+if(enddata==1)
+{ enddata=0;
+  datdig[0]=1*dat[0];
+  datdig[1]=2*dat[1];
+  datdig[2]=4*dat[2];
+  datdig[3]=8*dat[3];
+  datdig[4]=16*dat[4];
+  datdig[5]=32*dat[5];
+  datdig[6]=64*dat[6];
+  datdig[7]=128*dat[7];
+  
+  for(int j=0; j<=7; j++)
+  { 
+    charbuf[g] = datdig[j] + charbuf[g];
+    charnum[g] = datdig[j] + charnum[g];
+    value= value + datdig[j];
+  }
+
+  //KIRIM DATA data
+    if(value=='B'){
+    Serial.println();
+    Serial.println("data DATA END");
+    Serial.println();
+    data_state=0;
+    }
+  if(data_state==1){
+  /*Serial.print("\n data ke");
+  Serial.print(g);
+  Serial.print("  :");*/
+  Serial.print(value);}
+  if(value=='X')
+  {
+    Serial.println("data ");
+    data_state=1;
+  }
+   
+    
+   //KIRIM DATA KEDALAMAN
+   
+ /* if(data_state==1){
+  /*Serial.print("\n data ke");
+  Serial.print(g);
+  Serial.print("  :");
+  Serial.print(charbuf[g]);}*/
+ 
+    
+  
+  startconv=0;
+    i=0;
+     value=0;
+     /*
+  //Serial.print("--");
+  //Serial.println(charnum[g]);
+  g++;
+ 
+  charbuf[g]=0;
+  charnum[g]=0;
+  if(g>=40)
+  {g=0;
+ // Serial.println("end data");
+  g=0;}*/
+}
+
+
+}
+  // put your main code here, to run repeatedly:
+
